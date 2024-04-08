@@ -1,5 +1,7 @@
 package dev.steve.dadjokes;
 
+import java.security.InvalidParameterException;
+
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatClient;
 import org.springframework.ai.bedrock.cohere.BedrockCohereChatOptions;
 import org.springframework.ai.bedrock.cohere.api.CohereChatBedrockApi;
@@ -36,16 +38,27 @@ public class CloudGateBedrockCohereChatClient {
     @Value("${spring.ai.bedrock.cohere.chat.options.temperature}")
     private float temp;
 
-    public BedrockCohereChatClient geneate() {
-        if (client != null) return client;
+    public BedrockCohereChatClient generate() 
+    {
+        ObjectMapper mapper = null;            
+        AwsCredentials awsCreds = null;
+        AwsCredentialsProvider awsCredentialProvider = null;
+        BedrockCohereChatOptions chatOptions = null;
 
-        ObjectMapper mapper = new ObjectMapper();
-        AwsCredentials awsCreds = AwsSessionCredentials.create(accessKey, secretKey, sessionToken);
-        AwsCredentialsProvider cp = StaticCredentialsProvider.create(awsCreds); 
-        BedrockCohereChatOptions options = new BedrockCohereChatOptions();
-        options.setTemperature(temp);  //any additional config needed here?
-        CohereChatBedrockApi chatApi = new CohereChatBedrockApi(modelId, cp, region, mapper);
-        client = new BedrockCohereChatClient(chatApi, options);
+        if (client == null) 
+        {
+            awsCreds = AwsSessionCredentials.create(accessKey, secretKey, sessionToken);
+            awsCredentialProvider = StaticCredentialsProvider.create(awsCreds); 
+            chatOptions = new BedrockCohereChatOptions();
+
+            chatOptions.setTemperature(temp);  //any additional config needed here?
+
+            mapper = new ObjectMapper();            
+            CohereChatBedrockApi chatApi = new CohereChatBedrockApi(modelId, awsCredentialProvider, region, mapper);
+
+            client = new BedrockCohereChatClient(chatApi, chatOptions);    
+        }
+
         return client;
     }
 

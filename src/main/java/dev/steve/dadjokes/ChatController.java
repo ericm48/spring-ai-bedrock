@@ -23,7 +23,7 @@ public class ChatController {
     @Autowired
     public ChatController(BedrockCohereChatClient chatClient, CloudGateBedrockCohereChatClient cloudGateChatClient) {
         this.chatClient = chatClient;
-        this.chatClientCG = cloudGateChatClient.geneate();
+        this.chatClientCG = cloudGateChatClient.generate();
     }
 
     @GetMapping("/dad-jokes")
