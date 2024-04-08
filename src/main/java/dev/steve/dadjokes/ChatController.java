@@ -18,21 +18,23 @@ import org.springframework.web.bind.annotation.RestController;
 public class ChatController {
 
     private final BedrockCohereChatClient chatClient;
+    private final BedrockCohereChatClient chatClientCG; //CG Version
 
     @Autowired
-    public ChatController(BedrockCohereChatClient chatClient) {
+    public ChatController(BedrockCohereChatClient chatClient, CloudGateBedrockCohereChatClient cloudGateChatClient) {
         this.chatClient = chatClient;
+        this.chatClientCG = cloudGateChatClient.geneate();
     }
 
     @GetMapping("/ai/generate")
     public Map generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
-        return Map.of("generation", chatClient.call(message));
+        return Map.of("generation", chatClientCG.call(message));
     }
 
     @GetMapping("/ai/generateStream")
     public Flux<ChatResponse> generateStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
-        return chatClient.stream(prompt);
+        return chatClientCG.stream(prompt);
     }
 }
