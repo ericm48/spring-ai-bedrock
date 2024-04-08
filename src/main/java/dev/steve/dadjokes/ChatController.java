@@ -26,12 +26,12 @@ public class ChatController {
         this.chatClientCG = cloudGateChatClient.geneate();
     }
 
-    @GetMapping("/ai/generate")
+    @GetMapping("/dad-jokes")
     public Map generate(@RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         return Map.of("generation", chatClientCG.call(message));
     }
 
-    @GetMapping("/ai/generateStream")
+    @GetMapping("/dad-jokes/generateStream")
     public Flux<ChatResponse> generateStream(
             @RequestParam(value = "message", defaultValue = "Tell me a joke") String message) {
         Prompt prompt = new Prompt(new UserMessage(message));
